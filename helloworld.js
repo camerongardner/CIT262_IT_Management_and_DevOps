@@ -1,3 +1,3 @@
 const myName = "Daniel Cameron Gardner"
 
-console.log("Hellot " + myName)
+console.log("Hello " + myName)
