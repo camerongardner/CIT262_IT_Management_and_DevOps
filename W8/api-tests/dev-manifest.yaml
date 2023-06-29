@@ -13,7 +13,7 @@ spec:
         app: cameron-api 
     spec:
       containers:
-        - name: sean-api
+        - name: cameron-api
         # This image is going to be the path to the image you create in a future step
           image: us-docker.pkg.dev/team6-itdevops/cameron-api/api-tests 
           ports:
