@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cameron-stedi-sean
+spec:
+  selector:
+    matchLabels:
+      app: cameron-stedi-sean  # has to match .spec.template.metadata.labels
+  serviceName: cameron-stedi-sean
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cameron-stedi-sean  # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+        - name: cameron-stedi-sean
+          image: cameron:7.0.5-alpine
+          imagePullPolicy: Always
+          args: ["--requirepass", "$(cameron_PASS)", "--appendonly", "yes", "--save", "900", "1", "--save", "30", "2"]
+          ports:
+            - containerPort: 6379
+              name: cameron
+          env:
+          - name: cameron_PASS
+            valueFrom:
+              secretKeyRef:
+                name: cameron-secrets-sean
+                key: cameron_PASS
+          volumeMounts:
+            - name: cameron-sean-volume
+              mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: cameron-sean-volume
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+---          
+apiVersion: v1
+kind: Service
+metadata:
+  name: cameron-stedi-sean
+spec:
+  ports:
+    - port: 6379
+      name: cameron
+  clusterIP: None
+  selector:
+    app: cameron-stedi-sean
