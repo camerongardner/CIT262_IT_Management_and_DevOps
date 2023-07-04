@@ -1,38 +1,38 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: cameron-stedi-sean
+  name: redis-stedi-cameron
 spec:
   selector:
     matchLabels:
-      app: cameron-stedi-sean  # has to match .spec.template.metadata.labels
-  serviceName: cameron-stedi-sean
+      app: redis-stedi-cameron  # has to match .spec.template.metadata.labels
+  serviceName: redis-stedi-cameron
   replicas: 1
   template:
     metadata:
       labels:
-        app: cameron-stedi-sean  # has to match .spec.selector.matchLabels
+        app: redis-stedi-cameron  # has to match .spec.selector.matchLabels
     spec:
       containers:
-        - name: cameron-stedi-sean
-          image: cameron:7.0.5-alpine
+        - name: redis-stedi-cameron
+          image: redis:7.0.5-alpine
           imagePullPolicy: Always
-          args: ["--requirepass", "$(cameron_PASS)", "--appendonly", "yes", "--save", "900", "1", "--save", "30", "2"]
+          args: ["--requirepass", "$(redis_PASS)", "--appendonly", "yes", "--save", "900", "1", "--save", "30", "2"]
           ports:
             - containerPort: 6379
-              name: cameron
+              name: redis
           env:
-          - name: cameron_PASS
+          - name: redis_PASS
             valueFrom:
               secretKeyRef:
-                name: cameron-secrets-sean
-                key: cameron_PASS
+                name: redis-secrets-cameron
+                key: redis_PASS
           volumeMounts:
-            - name: cameron-sean-volume
+            - name: redis-cameron-volume
               mountPath: /data
   volumeClaimTemplates:
   - metadata:
-      name: cameron-sean-volume
+      name: redis-cameron-volume
     spec:
       accessModes:
         - ReadWriteOnce
@@ -43,11 +43,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cameron-stedi-sean
+  name: redis-stedi-cameron
 spec:
   ports:
     - port: 6379
-      name: cameron
+      name: redis
   clusterIP: None
   selector:
-    app: cameron-stedi-sean
+    app: redis-stedi-cameron
